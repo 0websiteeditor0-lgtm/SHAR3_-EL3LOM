@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الطالب | عالم العلوم - مس عفاف</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070d14;
+            --panel-bg: #0d1724;
+            --card-bg: #132238;
+            --accent-gold: #d4af37;
+            --text-main: #f1f5f9;
+            --text-muted: #8493a8;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Navbar العلوي البسيط */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 25px;
+        }
+
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+        }
+
+        .btn-back {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            opacity: 0.8;
+        }
+
+        /* Banner الترحيب */
+        .welcome-banner {
+            background: linear-gradient(135deg, #10243d 0%, #0d1724 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .welcome-banner h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .welcome-banner p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* كارت البحث */
+        .search-box-container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-box-container h3 {
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px 18px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .input-group button {
+            padding: 12px 25px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .input-group button:hover {
+            transform: scale(1.02);
+        }
+
+        /* عرض النتائج */
+        .results-section {
+            display: none;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table-custom th, .table-custom td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-custom th {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .table-custom td {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .badge-status {
+            background-color: rgba(212, 175, 55, 0.15);
+            color: var(--accent-gold);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-group { flex-direction: column; }
+            .top-header { flex-direction: column; gap: 10px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-wrapper">
+        <header class="top-header">
+            <div class="user-welcome">
+                <div class="avatar"><i class="fas fa-graduation-cap"></i></div>
+                <div>
+                    <h4 style="color:#fff;">بوابة استعلام نتائج الطلاب</h4>
+                    <span style="color:var(--text-muted); font-size:0.85rem;">شارع العلوم — مس عفاف (بني سويف)</span>
+                </div>
+            </div>
+            <a href="index.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> العودة للرئيسية
+            </a>
+        </header>
+
+        <div class="welcome-banner">
+            <h2>مرحباً بك في منصة العلوم</h2>
+            <p>أدخل الكود السري الخاص بالطالب لمتابعة الدرجات والغياب وملاحظات مس عفاف</p>
+        </div>
+
+        <div class="search-box-container">
+            <h3><i class="fas fa-key"></i> استعلام عن درجات الطالب</h3>
+            <div class="input-group">
+                <input type="text" id="studentCode" placeholder="أدخل كود الطالب السري">
+                <button onclick="getStudentData()">عرض التقرير</button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h3 style="color:#fff; margin-bottom:20px; font-size:1.4rem;" id="stName">اسم الطالب</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-title">الدرجة في العلوم</div>
+                    <div class="stat-value" id="stGrade">0 / 100</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <div class="stat-title">الغياب والحضور</div>
+                    <div class="stat-value" id="stAttendance">-</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-layer-group"></i>
+                    <div class="stat-title">الصف الدراسي</div>
+                    <div class="stat-value" style="font-size:1rem;" id="stLevel">-</div>
+                </div>
+            </div>
+
+            <h4 style="color:var(--accent-gold); margin-top:20px; margin-bottom:10px;"><i class="fas fa-clipboard-list"></i> تقرير ملاحظات مس عفاف</h4>
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>المادة</th>
+                        <th>الحالة</th>
+                        <th>الملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>العلوم (المرحلة الابتدائية)</td>
+                        <td><span class="badge-status">متابعة مستمرة</span></td>
+                        <td id="stNotes">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://vloagzhnhfqyadhpxiif.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_Oa-X8xiOKzEeEMTBW858ug_iUyO1_yG';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function getStudentData() {
+            const code = document.getElementById('studentCode').value.trim();
+            const resultsSection = document.getElementById('resultsSection');
+
+            if(!code) {
+                alert('برجاء كتابة كود الطالب أولاً');
+                return;
+            }
+
+            const { data, error } = await _supabase
+                .from('science_students')
+                .select('*')
+                .eq('student_code', code)
+                .single();
+
+            if (error || !data) {
+                alert('لم يتم العثور على طالب بهذا الكود! تأكد من الرقم وأعد المحاولة.');
+                resultsSection.style.display = 'none';
+                return;
+            }
+
+            document.getElementById('stName').innerText = data.name;
+            document.getElementById('stGrade').innerText = `${data.grade} / 100`;
+            document.getElementById('stAttendance').innerText = data.attendance || 'منتظم';
+            document.getElementById('stLevel').innerText = data.level;
+            document.getElementById('stNotes').innerText = data.notes || 'لا توجد ملاحظات مسجلة حتى الآن';
+
+            resultsSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
